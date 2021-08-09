@@ -1,8 +1,17 @@
 import csv
-
-from flask import Flask, render_template, request, redirect
+import os
+from flask import Flask, render_template, request, redirect, send_from_directory
 
 app = Flask(__name__)
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, "static/assets"),
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
+    )
 
 
 @app.route("/")
@@ -22,14 +31,14 @@ def submit_form():
             data = request.form.to_dict()
             write_to_csv(data)
             return redirect("/thank_you.html")
-        except:
-            return "not saved to database"
+        except Exception as e:
+            return f"{e}"
     else:
         return "something is wrong"
 
 
 def write_to_file(data):
-    with open("./venv/database.txt", mode="a") as database:
+    with open("./database.txt", mode="a") as database:
         email = data["email"]
         subject = data["subject"]
         message = data["message"]
@@ -37,7 +46,7 @@ def write_to_file(data):
 
 
 def write_to_csv(data):
-    with open("./venv/database.csv", mode="a", newline="") as database_csv:
+    with open("./database.csv", mode="a", newline="") as database_csv:
         email = data["email"]
         subject = data["subject"]
         message = data["message"]
